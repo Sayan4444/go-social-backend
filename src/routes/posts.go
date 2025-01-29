@@ -5,8 +5,10 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func RegisterPostRoutes(router *mux.Router) {
+func RegisterPostRoutes(r *mux.Router) {
 	Posts := controllers.Posts{}
-	router.HandleFunc("/posts", Posts.CreatePost).Methods("POST")
-	router.HandleFunc("/posts/{id}", Posts.GetPostByID).Methods("GET")
+	postsRouter := r.PathPrefix("/posts").Subrouter()
+
+	postsRouter.HandleFunc("", Posts.CreatePost).Methods("POST")
+	postsRouter.HandleFunc("/{id}", Posts.GetPostByID).Methods("GET")
 }

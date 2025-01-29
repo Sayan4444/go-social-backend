@@ -16,15 +16,14 @@ func main() {
 	godotenv.Load(".env")
 	database.Connect()
 
-	database.Connect()
 	db := database.GetDB()
-	db.AutoMigrate(&models.Post{})
 	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.Post{})
 
-	r := mux.NewRouter()
+	r := mux.NewRouter().PathPrefix("/api").Subrouter()
 
 	routes.RegisterPostRoutes(r)
-	http.Handle("/api", r)
+	// http.Handle("/", r)
 	log.Printf("Server started")
 	port := utils.GetEnvAsString("PORT")
 	log.Fatal(http.ListenAndServe(":"+port, r))

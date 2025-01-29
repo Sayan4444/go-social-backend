@@ -11,8 +11,8 @@ import (
 )
 
 type createPostPayload struct {
-	Content string   `json:"content" validate:"required,max=100"`
-	Title   string   `json:"title" validate:"required,max=100"`
+	Content string   `validate:"required,max=100"`
+	Title   string   `validate:"required,max=100"`
 	Tags    []string `json:"tags"`
 }
 
@@ -23,7 +23,6 @@ var validate *validator.Validate
 func (p *Posts) CreatePost(w http.ResponseWriter, r *http.Request) {
 	db := database.GetDB()
 	var payload createPostPayload
-
 	err := utils.ReadJSON(r, &payload)
 	if err != nil {
 		utils.BadRequest(w, r, err)
@@ -37,14 +36,20 @@ func (p *Posts) CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := db.Create(&payload)
+	post := models.Post{
+		Content: payload.Content,
+		Title:   payload.Title,
+		Tags:    payload.Tags,
+	}
+
+	result := db.Create(&post)
 
 	if result.Error != nil {
 		utils.WriteJSONError(w, http.StatusInternalServerError, "Failed to create book")
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusCreated, payload)
+	utils.WriteJSON(w, http.StatusCreated, post)
 }
 
 func (p *Posts) GetPostByID(w http.ResponseWriter, r *http.Request) {
